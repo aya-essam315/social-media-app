@@ -23,14 +23,14 @@ export const uploadFileDisk = (
          
     const storage = multer.diskStorage({
         destination: (req,file,cb)=>{
-            console.log(req.baseUrl);
+            // console.log(req.baseUrl);
             
             // if(req.baseUrl.includes("comment")){
             //     customPath = "posts/comments"
             // }
             basePath = `uploads/${customPath}/${req.authUser._id}`
             const fullPath = path.resolve(`./src/${basePath}`)
-            console.log({fullPath});
+            // console.log({fullPath});
             if(!fs.existsSync(fullPath)){
                 fs.mkdirSync(fullPath, {recursive:true})
 

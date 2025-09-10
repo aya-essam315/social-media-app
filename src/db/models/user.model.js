@@ -70,7 +70,8 @@ const userSchema = new Schema({
    twoStepVerification:{type:Boolean, default:false},
    twoStepVerificationCode: String,
    updatedBy:{type:Types.ObjectId},
-   blockList:[{type:Types.ObjectId, ref:"User"}]
+   blockList:[{type:Types.ObjectId, ref:"User"}],
+   friends:[{type:Types.ObjectId, ref:"User"}]
 }, { timestamps: true , toJSON:{virtuals:true}, toObject:{virtuals:true}});
 
 
@@ -81,8 +82,10 @@ userSchema.virtual('userName').
   set(function(v) {
     // const firstName = v.split()
 
-     const firstName = this.userName[0];
-    const lastName = this.userName[1];
+
+    
+     const firstName = v.split(" ")[0];
+    const lastName = v.split(" ")[1];
     this.set({ firstName, lastName });
     console.log({ firstName, lastName });
     
@@ -92,6 +95,9 @@ userSchema.virtual('userName').
 
 
 export const UserModel = model("User", userSchema);
+
+
+export const connections = new Map()
 
 
 

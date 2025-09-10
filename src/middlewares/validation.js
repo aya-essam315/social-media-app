@@ -4,7 +4,7 @@ import joi from "joi";
 export const isValidate=(schema)=>{
     return (req,res,next)=>{
             // console.log(req.body);
-            console.log({gggggggggggg:req.body});
+            // console.log({gggggggggggg:req.body});
             
         
         const data = {...req.body, ...req.params, ...req.query}
@@ -15,7 +15,7 @@ export const isValidate=(schema)=>{
             data.file = req.file || req.files
         }
 
-        console.log({data:data.file});
+        // console.log({data:data.file});
         
     
    

@@ -2,6 +2,7 @@ import authRouter from "./modules/auth/auth.controller.js"
 import { globalError } from "./utils/errors/global.error.js";
 import userRouter from "./modules/user/user.controller.js"
 import postRouter from "./modules/post/post.controller.js"
+import  chatRouter  from "./modules/chat/chat.controller.js";
 import path from "path";
 import cors from "cors"
 import { rateLimit } from 'express-rate-limit'
@@ -22,6 +23,7 @@ const bootStrap = (app, express)=>{
     app.use("/auth", authRouter);
     app.use("/user", userRouter);
     app.use("/post", postRouter)
+    app.use("/chat", chatRouter)
     app.use(globalError);
     app.use( (req, res, next) => {
         res.status(404).json({ message: "page not found" });

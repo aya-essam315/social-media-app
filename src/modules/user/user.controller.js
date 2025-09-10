@@ -23,6 +23,9 @@ router.get("/change-role",
           userServices.changeRole
 )
 
+router.patch("/profile/add-friend/:friendId", authentication, userServices.addFriend)
+router.patch("/profile/accept/:friendRequestId", authentication, userServices.acceptFriendRequet)
+
 router.get("/profile",
      authentication,
      isValidate(userValidation.idValidation),

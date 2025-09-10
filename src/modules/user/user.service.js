@@ -8,6 +8,23 @@ import { successResponse } from "../../utils/success/success.response.js";
 import Randomstring from "randomstring";
 import fs from "fs"
 import path from "path"
+import { FriendRequestModel } from "../../db/models/frinds.model.js";
+
+export const addFriend = asyncHandler(async(req,res,next)=>{
+    const {friendId} = req.params;
+
+    const user = await UserModel.findOne({_id:friendId});
+    if(!user){
+        return next(new Error("user not found", {cause:404}))
+    }
+
+    const firendRequest = await FriendRequestModel.create({
+        friendId,
+        createdBy:req.authUser._id,
+
+    })
+    successResponse({res, statusCode:201, data: firendRequest})
+})
 
 export const getAll = asyncHandler(async(req,res,next)=>{
     const result = await Promise.all([
@@ -16,6 +33,40 @@ export const getAll = asyncHandler(async(req,res,next)=>{
     ])
     successResponse({res, data:result})
 })
+
+export const acceptFriendRequet = asyncHandler(async(req,res,next)=>{
+    const {friendRequestId} = req.params;
+
+    const friendRequest = await FriendRequestModel.findOneAndDelete({_id: friendRequestId, status:false})
+    // console.log(friendRequest);
+    
+console.log(friendRequest.createdBy, friendRequest.createdBy);
+
+   const user1 =  await UserModel.findOneAndUpdate({_id: req.authUser._id},
+        {
+            $addToSet:{
+                friends: friendRequest.createdBy
+            }
+        },{new:true}
+    )
+
+    // console.log(user1);
+    
+const  user2= await UserModel.findOneAndUpdate({_id: friendRequest.createdBy},
+        {
+            $addToSet:{
+                friends: req.authUser._id
+            }
+        },{new:true}
+    )
+
+    // console.log(user2);
+    
+successResponse({res, data:{user1,user2}})
+
+})
+
+
 
 export const changeRole = asyncHandler(async(req,res,next)=>{
     const roles = req.authUser.role === roleTypes.superAdmin ?
@@ -39,7 +90,8 @@ export const changeRole = asyncHandler(async(req,res,next)=>{
 export const getProfile = asyncHandler(async(req,res,next)=>{
 
     const user = await UserModel.findById(req.authUser._id)
-    .populate("viewers.userId")
+    // .populate("viewers.userId")
+    .populate([{path:"friends", select:"firstName lastName image" }])
     successResponse({res, data:{user}})
 })
 

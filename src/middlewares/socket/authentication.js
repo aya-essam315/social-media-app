@@ -1,21 +1,20 @@
-import { UserModel } from "../db/models/user.model.js";
-import { asyncHandler } from "../utils/errors/async.handler.js";
-import { verifyToken } from "../utils/security/token/token.js";
+import { UserModel } from "../../db/models/user.model.js";
+import { asyncHandler } from "../../utils/errors/async.handler.js";
+import { verifyToken } from "../../utils/security/token/token.js";
 
 
-export const authentication = asyncHandler(
-     async(req, res, next)=>{
+export const authentication =   async({socket={}})=>{
 
         
-        const {authorization} = req.headers;
+      //   const {authorization} = req.headers;
 
-      //   console.log( {authorization});
+      //   console.log( {socket});
         
 
-        const [bearer, token] = authorization?.split(' ') || [];
+        const [bearer, token] = socket?.handshake?.auth?.authorization?.split(' ') || [];
   
         if(!bearer || !token){
-                 return next(new Error("invalid authorization component.", {cause:401}))
+                 return {data: {message:"invalid authorization component.", status:401}}
         }
       //    let jwt_sign = "ss"
 
@@ -44,24 +43,28 @@ export const authentication = asyncHandler(
         
         
         if(!id){
-           return next(new Error("invalid token.", {cause:401}))
+          
+            return {data: {message:"invalid token.", status:401}}
         }
     
 
         const user = await UserModel.findById(id)
      
         if(!user){
-                return next(new Error("user not found.", {cause:404}))
+           
+            return {data: {message:"user not found.", status:404}}
+
         }
            if(user.changeCredentialsTime?.getTime() >=  iat*1000 || user.isDeleted == true){
-            return next(new Error("invalid credintioals .", {cause:400}))
+                       return {data: {message:"invalid credintioals.", status:400}}
+
            }
 
-        req.authUser = user
+     return {data: {message:"done", user}, valid:true}
   
         
-        return next()
+   
 
 
 }
-)
+
